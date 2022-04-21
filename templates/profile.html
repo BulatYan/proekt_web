@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3>Профиль</h3>
+<p class="my-3 my-md-4">Вы можете изменить группу, свой логин, почту и пароль.</p>
+<p class="my-3 my-md-4">Введите новые значения и кликните изменить.</p>
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <div class="m4 row justify-content-around">
+        <div class="col-12 col-md-4">
+            {{ form.group.label }}<br>
+            {{ form.group(class="form-control border border-warning") }}<br>
+            {% for error in form.group.errors %}
+            <p class="alert alert-danger" role="alert">{{ error }}</p>
+            {% endfor %}
+        </div>
+        <div class="col-12 col-md-4">
+            {{ form.email.label }}<br>
+            {{ form.email(class="form-control border border-warning", type="email") }}<br>
+            {% for error in form.email.errors %}
+            <p class="alert alert-danger" role="alert">{{ error }}</p>
+            {% endfor %}
+        </div>
+        <div class="col-12 col-md-4">
+            {{ form.login.label }}<br>
+            {{ form.login(class="form-control border border-warning") }}<br>
+            {% for error in form.login.errors %}
+            <p class="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="m4 row justify-content-around">
+        <div class="col-12 col-md-5">
+            {{ form.password.label }}<br>
+            {{ form.password(class="form-control border border-warning", type="password") }}<br>
+            {% for error in form.password.errors %}
+            <p class="alert alert-danger" role="alert">{{ error }}</p>
+            {% endfor %}
+        </div>
+        <div class="col-12 col-md-5">
+            {{ form.password_again.label }}<br>
+            {{ form.password_again(class="form-control border border-warning", type="password") }}<br>
+            {% for error in form.password_again.errors %}
+            <p class="alert alert-danger" role="alert">
+                {{ error }}
+        </div>
+        {% endfor %}
+    </div>
+    </div>
+    <div class="m4 row justify-content-around">
+        <div class="col-2">{{ form.submit(type="submit", class="btn btn-primary") }}</div>
+        <div class="col-2">{{ form.cancel(type="submit", class="btn btn-primary") }}</div>
+    </div>
+    {% if message: %}
+    <div class="my-4 alert alert-danger" role="alert"> {{message}}</div>
+    {% endif %}
+</form>
+{% endblock %}

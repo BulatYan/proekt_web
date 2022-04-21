@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Характеристики обо мне</h3>
+<p class="my-3 my-md-4">Здесь вы можете посмотреть какие качества отметили у вас члены вашей группы.</p>
+{% for descr in descr_list%}
+<div class="my-2 p-2 border rounded border-warning">
+    {{ descr }}
+</div>
+{% endfor %}
+{% endblock %}
