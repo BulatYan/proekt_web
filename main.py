@@ -39,11 +39,14 @@ def login():
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.email == form.email.data).first()
-        s = user.check_password(form.password.data)
-        if user and s:
-            login_user(user, remember=form.remember_me.data)
-            return redirect('/')
-        return render_template('login.html', message='Неправильный логин или пароль',
+        if user:
+            true_pass = user.check_password(form.password.data)
+            if true_pass:
+                login_user(user, remember=form.remember_me.data)
+                return redirect('/')
+            return render_template('login.html', message='Неправильный пароль',
+                                   form=form)
+        return render_template('login.html', message='Неправильный логин',
                                form=form)
     return render_template('login.html', title='Авторизация', form=form)
 
