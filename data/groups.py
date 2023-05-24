@@ -24,3 +24,13 @@ class GroupMember(SqlAlchemyBase):
                                     sqlalchemy.ForeignKey("Groups.id"))
     member = sqlalchemy.Column(sqlalchemy.Integer,
                                     sqlalchemy.ForeignKey("Users.id"))
+
+
+class Ticket(SqlAlchemyBase, UserMixin, SerializerMixin):
+    __tablename__ = 'Tickets'
+    id = sqlalchemy.Column(sqlalchemy.Integer,
+                           primary_key=True, autoincrement=True)
+    members_group = sqlalchemy.Column(sqlalchemy.Integer,
+                                      sqlalchemy.ForeignKey("Groups.id"))
+    email = sqlalchemy.Column(sqlalchemy.String,
+                              index=True, unique=True, nullable=False)

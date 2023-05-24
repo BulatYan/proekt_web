@@ -4,8 +4,8 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 
 from data import db_session
 from data.users import User
-from data.groups import Group, GroupMember
-from form.user import RegisterForm, LoginForm, MemberForm, ProfileForm
+from data.groups import Group, GroupMember, Ticket
+from form.user import RegisterForm, LoginForm, MemberForm, ProfileForm, InviteForm
 from form.group import Create_GroupForm
 from data.description import Description
 
@@ -71,6 +71,20 @@ def reqister():
                                    form=form,
                                    message="Пароли не совпадают")
         db_sess = db_session.create_session()
+
+        # Есть ли приглашение
+        is_group = False
+        if db_sess.query(Group).filter(Group.group_name == form.group.data).first():
+            is_group = True
+            if db_sess.query(Ticket).filter(Ticket.email == form.email.data).first():
+                if db_sess.query(Ticket).filter(Ticket.group != form.group.data).first():
+                    return render_template('register.html', title='Регистрация',
+                                           form=form,
+                                           message=f"Вас пригласили не в {form.group.data}, а в {Ticket.group}")
+            else:
+                return render_template('register.html', title='Регистрация',
+                                       form=form,
+                                       message=f"У вас нет приглашения в эту группу {form.group.data}")
         if db_sess.query(User).filter(User.email == form.email.data).first():
             return render_template('register.html', title='Регистрация',
                                    form=form,
@@ -82,6 +96,21 @@ def reqister():
         )
         user.set_password(form.password.data)
         db_sess.add(user)
+        db_sess.commit()
+        if not is_group:
+            group = Group(
+                group_admin=user.id,
+                group_name=form.group.data,
+                description='Создан при регистрации'
+            )
+            db_sess.add(group)
+            db_sess.commit()
+        group = db_sess.query(Group).filter(Group.group_name == form.group.data).first()
+        group_member = GroupMember(
+                member=user.id,
+                members_group=group.id,
+            )
+        db_sess.add(group_member)
         db_sess.commit()
         return redirect('/')
     return render_template('register.html', title='Регистрация', form=form)
@@ -268,7 +297,26 @@ def my_groups():
 
 @app.route("/invite", methods=['GET', 'POST'])
 def invite():
-    pass
+    form = InviteForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        admin_group = db_sess.query(User).filter(User.id == current_user.group).first()
+        if admin_group:
+            group = Group(
+                group_admin=admin.id,
+                group_name=form.group.data,
+                description=form.description.data
+            )
+            group_member = GroupMember(
+                members_group=form.group.data,
+                member=admin.id
+            )
+            db_sess.add(group)
+            db_sess.add(group_member)
+            db_sess.commit()
+            return redirect('/')
+
+    return render_template('create_group.html', title='Создание группы', form=form)
 
 def main():
     db_session.global_init("db/db.db")
