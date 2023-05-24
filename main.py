@@ -4,7 +4,9 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 
 from data import db_session
 from data.users import User
+from data.groups import Group, GroupMember
 from form.user import RegisterForm, LoginForm, MemberForm, ProfileForm
+from form.group import Create_GroupForm
 from data.description import Description
 
 app = Flask(__name__)
@@ -231,8 +233,45 @@ def aboutme():
     return render_template('aboutme.html', descr_list=descr_list)
 
 
+@app.route("/create_group", methods=['GET', 'POST'])
+def ctreate_group():
+    form = Create_GroupForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        admin = db_sess.query(User).filter(User.id == current_user.id).first()
+        if admin:
+            group = Group(
+                group_admin=admin.id,
+                group_name=form.group.data,
+                description=form.description.data
+            )
+            group_member = GroupMember(
+                members_group=form.group.data,
+                member=admin.id
+            )
+            db_sess.add(group)
+            db_sess.add(group_member)
+            db_sess.commit()
+            return redirect('/')
+
+    return render_template('create_group.html', title='Создание группы', form=form)
+
+
+@app.route("/my_groups", methods=['GET', 'POST'])
+def my_groups():
+    db_sess = db_session.create_session()
+    group_list = []
+    for row in db_sess.query(GroupMember).all():
+        group_list.append(row.members_group)
+    return render_template('my_groups.html', group_list=group_list)
+
+
+@app.route("/invite", methods=['GET', 'POST'])
+def invite():
+    pass
+
 def main():
-    db_session.global_init("db/groups.db")
+    db_session.global_init("db/db.db")
     app.run()
 
 

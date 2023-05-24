@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3>Создать группу</h3>
+<p class="my-3 my-md-4">Здесь вам предстоит присоединиться к группе.</p>
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <div class="m4 row justify-content-around">
+        <div class="col-12 col-md-4">
+            {{ form.group.label }}<br>
+            {{ form.group(class="form-control border border-warning") }}<br>
+            {% for error in form.group.errors %}
+            <p class="alert alert-danger" role="alert">{{ error }}</p>
+            {% endfor %}
+        </div>
+        <div class="col-12 col-md-4">
+            {{ form.email.label }}<br>
+            {{ form.email(class="form-control border border-warning", type="email") }}<br>
+            {% for error in form.email.errors %}
+            <p class="alert alert-danger" role="alert">{{ error }}</p>
+            {% endfor %}
+        </div>
+    </div>
+    <div>{{ form.submit(type="submit", class="btn btn-primary") }}</div>
+    {% if message: %}
+    <div class="my-4 alert alert-danger" role="alert"> {{message}}</div>
+    {% endif %}
+</form>
+{% endblock %}

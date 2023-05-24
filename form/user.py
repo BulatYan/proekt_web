@@ -47,3 +47,8 @@ class ProfileForm(FlaskForm):
     password_again = PasswordField('Повторить пароль')
     submit = SubmitField('Изменить')
     cancel = SubmitField('Отменить')
+
+
+class InviteForm(FlaskForm):
+    group = StringField('Название группы', validators=[DataRequired()])
+    email = EmailField('Почта', validators=[DataRequired()])
