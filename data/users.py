@@ -11,7 +11,9 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True)
     login = sqlalchemy.Column(sqlalchemy.String, unique=True, nullable=False)
-    group = sqlalchemy.Column(sqlalchemy.String, nullable=False)
+    # group = sqlalchemy.Column(sqlalchemy.String, nullable=False)
+    group = sqlalchemy.Column(sqlalchemy.Integer,
+                              sqlalchemy.ForeignKey("Groups.id"))
     email = sqlalchemy.Column(sqlalchemy.String,
                               index=True, unique=True, nullable=False)
     password = sqlalchemy.Column(sqlalchemy.String, nullable=True)

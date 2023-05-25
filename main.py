@@ -73,45 +73,49 @@ def reqister():
         db_sess = db_session.create_session()
 
         # Есть ли приглашение
-        is_group = False
-        if db_sess.query(Group).filter(Group.group_name == form.group.data).first():
-            is_group = True
+
+        group_exists = False
+        group = db_sess.query(Group).filter(Group.group_name == form.group.data).first()
+        if group:
+            group_exists = True
             if db_sess.query(Ticket).filter(Ticket.email == form.email.data).first():
                 if db_sess.query(Ticket).filter(Ticket.group != form.group.data).first():
                     return render_template('register.html', title='Регистрация',
                                            form=form,
-                                           message=f"Вас пригласили не в {form.group.data}, а в {Ticket.group}")
+                                           message=f"У вас нет приглашения в {form.group.data} \
+                                           или вы неправильно написали группу.")
             else:
                 return render_template('register.html', title='Регистрация',
                                        form=form,
-                                       message=f"У вас нет приглашения в эту группу {form.group.data}")
+                                       message="У вас нет приглашений в никакие группы")
         if db_sess.query(User).filter(User.email == form.email.data).first():
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Такой пользователь уже есть")
+        if not group_exists:
+            group = Group(
+                group_name=form.group.data,
+                description='Создан при регистрации'
+            )
+            db_sess.add(group)
+            db_sess.commit()
         user = User(
-            group=form.group.data,
+            group=group.id,
             login=form.login.data,
             email=form.email.data
         )
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
-        if not is_group:
-            group = Group(
-                group_admin=user.id,
-                group_name=form.group.data,
-                description='Создан при регистрации'
-            )
-            db_sess.add(group)
-            db_sess.commit()
-        group = db_sess.query(Group).filter(Group.group_name == form.group.data).first()
+        if not group_exists:
+            group.group_admin = user.id
         group_member = GroupMember(
                 member=user.id,
                 members_group=group.id,
             )
         db_sess.add(group_member)
         db_sess.commit()
+        # TODO удалить тикет
         return redirect('/')
     return render_template('register.html', title='Регистрация', form=form)
 
