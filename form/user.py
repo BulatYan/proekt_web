@@ -52,3 +52,5 @@ class ProfileForm(FlaskForm):
 class InviteForm(FlaskForm):
     group = StringField('Название группы', validators=[DataRequired()])
     email = EmailField('Почта', validators=[DataRequired()])
+    submit = SubmitField('Создать')
+

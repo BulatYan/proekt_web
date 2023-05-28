@@ -79,7 +79,7 @@ def reqister():
         if group:
             group_exists = True
             if db_sess.query(Ticket).filter(Ticket.email == form.email.data).first():
-                if db_sess.query(Ticket).filter(Ticket.group != form.group.data).first():
+                if db_sess.query(Ticket).filter(Ticket.members_group != form.group.data).first():
                     return render_template('register.html', title='Регистрация',
                                            form=form,
                                            message=f"У вас нет приглашения в {form.group.data} \
@@ -304,23 +304,23 @@ def invite():
     form = InviteForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
-        admin_group = db_sess.query(User).filter(User.id == current_user.group).first()
-        if admin_group:
-            group = Group(
-                group_admin=admin.id,
-                group_name=form.group.data,
-                description=form.description.data
-            )
-            group_member = GroupMember(
+        ticket = db_sess.query(Ticket).filter(Ticket.email == form.email.data,
+                                              Ticket.members_group == form.group.data).first()
+
+        if ticket:
+            return render_template('invite.html', title='Приглашение в группу', form=form,
+                                   message=f"Приглашение {form.email.data} уже есть")
+        else:
+            ticket = Ticket(
                 members_group=form.group.data,
-                member=admin.id
+                email=form.email.data
             )
-            db_sess.add(group)
-            db_sess.add(group_member)
+            db_sess.add(ticket)
             db_sess.commit()
+            # TODO вернуть сообщение об успешном создание тикета
             return redirect('/')
 
-    return render_template('create_group.html', title='Создание группы', form=form)
+    return render_template('invite.html', title='Приглашение в группу', form=form)
 
 def main():
     db_session.global_init("db/db.db")
