@@ -279,25 +279,30 @@ def aboutme():
 
 
 @app.route("/create_group", methods=['GET', 'POST'])
+@login_required
 def ctreate_group():
     form = Create_GroupForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         admin = db_sess.query(User).filter(User.id == current_user.id).first()
-        if admin:
+        group = db_sess.query(Group).filter(Group.group_name == form.group.data).first()
+        if not group:
             group = Group(
                 group_admin=admin.id,
                 group_name=form.group.data,
                 description=form.description.data
             )
+            db_sess.add(group)
+            db_sess.commit()
             group_member = GroupMember(
-                members_group=form.group.data,
+                members_group=group.id,
                 member=admin.id
             )
-            db_sess.add(group)
             db_sess.add(group_member)
             db_sess.commit()
-            return redirect('/')
+            return "<h3>Создание группы</h3>" \
+                   f"<p class='my-3 my-md-4'> Группа {group.group_name} создана.</p>" \
+                   "<a href='/profile'>Возврат</a>"
 
     return render_template('create_group.html', title='Создание группы', form=form)
 
