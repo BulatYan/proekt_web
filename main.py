@@ -280,7 +280,7 @@ def aboutme():
 
 @app.route("/create_group", methods=['GET', 'POST'])
 @login_required
-def ctreate_group():
+def create_group():
     form = Create_GroupForm()
     if form.validate_on_submit():
         if form.cancel.data:
