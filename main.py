@@ -190,7 +190,8 @@ def member(member_id):
 def profile():
     form = ProfileForm()
     db_sess = db_session.create_session()
-    member_profile = db_sess.query(User).get(current_user.id)
+    user_profile = db_sess.query(User).get(current_user.id)
+    user_group = db_sess.query(Group).get(current_user.group)
     if form.validate_on_submit():
         if form.cancel.data:
             return redirect('/')
@@ -198,17 +199,28 @@ def profile():
             return render_template('profile.html', title='Изменение данных',
                                    form=form,
                                    message="Пароли не совпадают")
-        member_profile.login = form.login.data
-        member_profile.email = form.email.data
-        member_profile.group = form.group.data
+        user_profile.login = form.login.data
+        user_profile.email = form.email.data
+        user_group = db_sess.query(Group).fillter(Group.group_name == form.group.data).first()
+        if not user_group:
+            return render_template('profile.html', title='Изменение данных',
+                                   form=form,
+                                   message=f"Группа: '{form.group.data}' не существует.")
+        group_member = db_sess.query(GroupMember).fillter(GroupMember.members_group == user_group.id,
+                                                          GroupMember.member == user_profile.id).first()
+        if not group_member:
+            return render_template('profile.html', title='Изменение данных',
+                                   form=form,
+                                   message=f"Вы не являетесь членом группы '{form.group.data}'.")
+        user_profile.group = user_group.id
         if form.password.data:
-            member_profile.set_password(form.password.data)
+            user_profile.set_password(form.password.data)
         db_sess.commit()
         return redirect('/')
     else:
-        form.login.data = member_profile.login
-        form.email.data = member_profile.email
-        form.group.data = member_profile.group
+        form.login.data = user_profile.login
+        form.email.data = user_profile.email
+        form.group.data = user_group.group_name
     return render_template('profile.html', title='Изменение данных',
                            form=form)
 
@@ -309,7 +321,7 @@ def invite():
 
         if ticket:
             return render_template('invite.html', title='Приглашение в группу', form=form,
-                                   message=f"Приглашение {form.email.data} уже есть")
+                                   message=f"Приглашение в группу для {form.email.data} уже есть")
         else:
             ticket = Ticket(
                 members_group=form.group.data,
@@ -317,9 +329,12 @@ def invite():
             )
             db_sess.add(ticket)
             db_sess.commit()
-            # TODO вернуть сообщение об успешном создание тикета
-            return redirect('/')
-
+            # return render_template('message.html', title='Приглашение в группу',
+            #                        message=f"Пользователь {form.email.data} включен в группу")
+            return "<h3>Приглашение в группу</h3>"\
+                "<p class='my-3 my-md-4'> Отправте по email приглашение.</p>"\
+                f"<div>Пользователь {form.email.data} включен в группу</div>"\
+                "<a href='/'>Возврат</a>"
     return render_template('invite.html', title='Приглашение в группу', form=form)
 
 def main():

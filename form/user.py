@@ -54,3 +54,8 @@ class InviteForm(FlaskForm):
     email = EmailField('Почта', validators=[DataRequired()])
     submit = SubmitField('Создать')
 
+
+class MessageForm(FlaskForm):
+    message = StringField('Сообщение')
+    message_head = StringField('Сообщение')
+
