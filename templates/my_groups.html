@@ -3,7 +3,8 @@
 <h3>Здесь вы можете посмотреть в каких группах вы состоите.</h3>
 {% for group in group_list%}
 <div class="my-2 p-2 border rounded border-warning">
-    {{ group }}
+    {{ group[0] }} - {{ group[1] }}
 </div>
 {% endfor %}
+<a class="btn btn-primary" id="cancel" href="/profile">Отменить</a>
 {% endblock %}

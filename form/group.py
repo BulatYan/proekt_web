@@ -7,6 +7,8 @@ class Create_GroupForm(FlaskForm):
     group = StringField('Название группы', validators=[DataRequired()])
     description = StringField('Описание группы')
     submit = SubmitField('Создать группу')
+    cancel = SubmitField('Отменить')
+
 
 
 

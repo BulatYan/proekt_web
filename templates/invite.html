@@ -21,7 +21,11 @@
             {% endfor %}
         </div>
     </div>
-    <div>{{ form.submit(type="submit", class="btn btn-primary") }}</div>
+<!--    <div>{{ form.submit(type="submit", class="btn btn-primary") }}</div>-->
+    <div class="m4 row justify-content-around">
+        <div class="col-2">{{ form.submit(type="submit", class="btn btn-primary") }}</div>
+        <div class="col-2">{{ form.cancel(type="submit", class="btn btn-primary") }}</div>
+    </div>
     {% if message: %}
     <div class="my-4 alert alert-danger" role="alert"> {{message}}</div>
     {% endif %}

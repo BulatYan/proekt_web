@@ -283,6 +283,8 @@ def aboutme():
 def ctreate_group():
     form = Create_GroupForm()
     if form.validate_on_submit():
+        if form.cancel.data:
+            return redirect('/')
         db_sess = db_session.create_session()
         admin = db_sess.query(User).filter(User.id == current_user.id).first()
         group = db_sess.query(Group).filter(Group.group_name == form.group.data).first()
@@ -301,9 +303,11 @@ def ctreate_group():
             db_sess.add(group_member)
             db_sess.commit()
             return "<h3>Создание группы</h3>" \
-                   f"<p class='my-3 my-md-4'> Группа {group.group_name} создана.</p>" \
+                   f"<p class='my-3 my-md-4'> Группа '{group.group_name}' создана.</p>" \
                    "<a href='/profile'>Возврат</a>"
-
+        else:
+            return render_template('create_group.html', title='Создание группы', form=form,
+                                   message=f"Такая группа '{group.group_name}' уже есть.")
     return render_template('create_group.html', title='Создание группы', form=form)
 
 
@@ -311,8 +315,13 @@ def ctreate_group():
 def my_groups():
     db_sess = db_session.create_session()
     group_list = []
-    for row in db_sess.query(GroupMember).all():
-        group_list.append(row.members_group)
+    groups = db_sess.query(Group).filter(Group.group_admin == current_user.id).all()
+    for row in groups:
+        if not row.description:
+            row.description = 'None'
+        cor = (row.group_name, row.description)
+        group_list.append(cor)
+
     return render_template('my_groups.html', group_list=group_list)
 
 
@@ -320,6 +329,8 @@ def my_groups():
 def invite():
     form = InviteForm()
     if form.validate_on_submit():
+        if form.cancel.data:
+            return redirect('/')
         db_sess = db_session.create_session()
         ticket = db_sess.query(Ticket).filter(Ticket.email == form.email.data,
                                               Ticket.members_group == form.group.data).first()

@@ -53,7 +53,7 @@ class InviteForm(FlaskForm):
     group = StringField('Название группы', validators=[DataRequired()])
     email = EmailField('Почта', validators=[DataRequired()])
     submit = SubmitField('Создать')
-
+    cancel = SubmitField('Отменить')
 
 class MessageForm(FlaskForm):
     message = StringField('Сообщение')
