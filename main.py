@@ -129,58 +129,17 @@ def members(group):
     return render_template('members.html', members=group_members)
 
 
+
+
 #Создаем ссылку на сайт member
 @app.route('/member/<member_id>', methods=['GET', 'POST'])
 #Cоздаем функцию member
 def member(member_id):
     db_sess = db_session.create_session()
-    group_member = db_sess.query(User).get(member_id)
-    if member_id == current_user.id:
-        group = group_member.group
-        return redirect(f"/member/{group}")
-    else:
-        form = MemberForm()
-        descr = db_sess.query(Description).filter(Description.member_id == member_id,
-                                                  Description.author_id == current_user.id).first()
-        add_new = False
-        if descr is None:
-            descr = Description()
-            add_new = True
-        if form.validate_on_submit():
-            descr.member_id = group_member.id
-            descr.author_id = current_user.id
-            descr.har01 = form.har01.data
-            descr.har02 = form.har02.data
-            descr.har03 = form.har03.data
-            descr.har04 = form.har04.data
-            descr.har05 = form.har05.data
-            descr.har06 = form.har06.data
-            descr.har07 = form.har07.data
-            descr.har08 = form.har08.data
-            descr.har09 = form.har09.data
-            descr.har10 = form.har10.data
-            descr.har11 = form.har11.data
-            descr.har12 = form.har12.data
-            descr.har13 = form.har13.data
-            if add_new:
-                db_sess.add(descr)
-            db_sess.commit()
-            return redirect('/')
-        else:
-            form.har01.data = descr.har01
-            form.har02.data = descr.har02
-            form.har03.data = descr.har03
-            form.har04.data = descr.har04
-            form.har05.data = descr.har05
-            form.har06.data = descr.har06
-            form.har07.data = descr.har07
-            form.har08.data = descr.har08
-            form.har09.data = descr.har09
-            form.har10.data = descr.har10
-            form.har11.data = descr.har11
-            form.har12.data = descr.har12
-            form.har13.data = descr.har13
-        return render_template('member.html', member=group_member, form=form)
+    admin = db_sess.query(Group).filter(Group.group_admin == member_id).first()
+    if admin:
+        group_member = db_sess.query(User).get(member_id)
+    return render_template('member.html', message='У вас нет прав')
 
 
 #Создаем ссылку на сайт profile
@@ -283,8 +242,6 @@ def aboutme():
 def create_group():
     form = Create_GroupForm()
     if form.validate_on_submit():
-        if form.cancel.data:
-            return redirect('/')
         db_sess = db_session.create_session()
         admin = db_sess.query(User).filter(User.id == current_user.id).first()
         group = db_sess.query(Group).filter(Group.group_name == form.group.data).first()
@@ -329,8 +286,6 @@ def my_groups():
 def invite():
     form = InviteForm()
     if form.validate_on_submit():
-        if form.cancel.data:
-            return redirect('/')
         db_sess = db_session.create_session()
         ticket = db_sess.query(Ticket).filter(Ticket.email == form.email.data,
                                               Ticket.members_group == form.group.data).first()

@@ -15,7 +15,7 @@
         <div><a class="m-1 navbar-brand" href="/index">{{ current_user.login }}</a></div>
         {% if current_user.is_authenticated %}
         <div>
-            <a class="m-1 btn btn-primary " href="/members/{{ current_user.group }}">Список</a>
+            <a class="m-1 btn btn-primary " href="/members/{{ current_user.group }}">Выдача цели</a>
             <a class="m-1 btn btn-primary " href="/aboutme">About me</a>
             <a class="m-1 btn btn-primary " href="/profile">Профиль</a>
             <a class="m-1 btn btn-primary" href="/logout">Выйти</a></div>

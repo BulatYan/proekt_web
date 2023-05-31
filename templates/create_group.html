@@ -23,7 +23,7 @@
     </div>
     <div class="m4 row justify-content-around">
         <div class="col-2">{{ form.submit(type="submit", class="btn btn-primary") }}</div>
-        <a class="col-2 btn btn-primar" href='/profile'>Отменить</a>
+        <div class="col-2"><a class="btn btn-primary" id="cancel" href="/profile">Отменить</a></div>
 <!--        <div class="col-2">{{ form.cancel(type="submit", class="btn btn-primary") }}</div>-->
     </div>
     {% if message: %}

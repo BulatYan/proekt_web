@@ -1,14 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
-<h3>Характеристики </h3>
-<p class="my-3 my-md-4">Выберите характеристики и нажмите сохранить.</p>
-<p class="my-3 my-md-4">Ваша оценка останется анонимной.</p>
+<h3>Выдача цели </h3>
+<p class="my-3 my-md-4">Создайте и нажмите сохранить.</p>
 <div class="container">
     <form action="" method="post">
         {{ form.hidden_tag() }}
         <div class="row justify-content-md-start">
             <div class="mt-4 p-2 ">
-                Оцените пользователя:
+                Выдайте цель:
             </div>
         </div>
         <div class="mb-4 row justify-content-md-center">
@@ -20,46 +19,13 @@
             </div>
         </div>
         <div class="m4 row justify-content-around">
-            <div class="my-2 m-md-2 p-2 border border-warning col-md-5 col-lg-4 col-xl-3 ">{{ form.har01() }} {{
-                form.har01.label }}
-            </div>
-            <div class="my-2 m-md-2 p-2 border border-warning col-md-5 col-lg-4 col-xl-3">{{ form.har02() }} {{
-                form.har02.label }}
-            </div>
-            <div class="my-2 m-md-2 p-2 border border-warning col-md-5 col-lg-4 col-xl-3">{{ form.har03() }} {{
-                form.har03.label }}
-            </div>
-            <div class="my-2 m-md-2 p-2 border border-warning col-md-5 col-lg-4 col-xl-3">{{ form.har04() }} {{
-                form.har04.label }}
-            </div>
-            <div class="my-2 m-md-2 p-2 border border-warning col-md-5 col-lg-4 col-xl-3">{{ form.har05() }} {{
-                form.har05.label }}
-            </div>
-            <div class="my-2 m-md-2 p-2 border border-warning col-md-5 col-lg-4 col-xl-3">{{ form.har06() }} {{
-                form.har06.label }}
-            </div>
-            <div class="my-2 m-md-2 p-2 border border-warning col-md-5 col-lg-4 col-xl-3">{{ form.har07() }} {{
-                form.har07.label }}
-            </div>
-            <div class="my-2 m-md-2 p-2 border border-warning col-md-5 col-lg-4 col-xl-3">{{ form.har08() }} {{
-                form.har08.label }}
-            </div>
-            <div class="my-2 m-md-2 p-2 border border-warning col-md-5 col-lg-4 col-xl-3">{{ form.har09() }} {{
-                form.har09.label }}
-            </div>
-            <div class="my-2 m-md-2 p-2 border border-warning col-md-5 col-lg-4 col-xl-3">{{ form.har10() }} {{
-                form.har10.label }}
-            </div>
-            <div class="my-2 m-md-2 p-2 border border-warning col-md-5 col-lg-4 col-xl-3">{{ form.har11() }} {{
-                form.har11.label }}
-            </div>
-            <div class="my-2 m-md-2 p-2 border border-warning col-md-5 col-lg-4 col-xl-3">{{ form.har12() }} {{
-                form.har12.label }}
-            </div>
-            <div class="my-2 m-md-2 p-2 border border-warning col-md-5 col-lg-4 col-xl-3">{{ form.har13() }} {{
-                form.har13.label }}
-            </div>
-        </div>
+<!--        <div class="col-12 col-md-4">-->
+<!--            {{ form.target.label }}<br>-->
+<!--            {{ form.target(class="form-control border border-warning") }}<br>-->
+<!--            {% for error in form.target.errors %}-->
+<!--            <p class="alert alert-danger" role="alert">{{ error }}</p>-->
+<!--            {% endfor %}-->
+<!--        </div>-->
         <div>{{ form.submit(type="submit", class="my-2 p-2 btn btn-primary") }}</div>
         {% if message: %}
         <div class="my-4 alert alert-danger" role="alert"> {{message}}</div>
