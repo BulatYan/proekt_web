@@ -125,8 +125,13 @@ def reqister():
 #Cоздаем функцию members
 def members(group):
     db_sess = db_session.create_session()
-    group_members = db_sess.query(User).filter(User.group == group, User.id != current_user.id).all()
-    return render_template('members.html', members=group_members)
+    group_members = db_sess.query(GroupMember).filter(GroupMember.members_group == current_user.group,
+                                                      GroupMember.member != current_user.id).all()
+    group_members_new = []
+    for row in group_members:
+        group_members_new.append(db_sess.query(User).get(row.member))
+
+    return render_template('members.html', members=group_members_new)
 
 
 
@@ -136,7 +141,7 @@ def members(group):
 #Cоздаем функцию member
 def member(member_id):
     db_sess = db_session.create_session()
-    admin = db_sess.query(Group).filter(Group.group_admin == member_id).first()
+    admin0 = db_sess.query(Group).filter(Group.group_admin == member_id).first()
     if admin:
         group_member = db_sess.query(User).get(member_id)
     return render_template('member.html', message='У вас нет прав')

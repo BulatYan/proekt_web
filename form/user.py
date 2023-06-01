@@ -23,9 +23,20 @@ class LoginForm(FlaskForm):
 
 #Создаем класс MemberForm
 class MemberForm(FlaskForm):
+    har01 = BooleanField('Самодостаточность')
+    har02 = BooleanField('Честность')
+    har03 = BooleanField('Бесстрашие')
+    har04 = BooleanField('Доверие')
+    har05 = BooleanField('Заинтересованность')
+    har06 = BooleanField('Дружелюбие')
+    har07 = BooleanField('Чувствительность')
+    har08 = BooleanField('Поддержка')
+    har09 = BooleanField('Верность')
+    har10 = BooleanField('Чувство юмора')
+    har11 = BooleanField('Оптимизм')
+    har12 = BooleanField('Терпение')
+    har13 = BooleanField('Доброта')
     submit = SubmitField('Сохранить')
-    target = StringField('Цель', validators=[DataRequired()])
-
 
 #Создаем класс ProfileForm
 class ProfileForm(FlaskForm):
