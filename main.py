@@ -141,9 +141,16 @@ def members(group):
 #Cоздаем функцию member
 def member(member_id):
     db_sess = db_session.create_session()
-    admin0 = db_sess.query(Group).filter(Group.group_admin == member_id).first()
-    if admin:
-        group_member = db_sess.query(User).get(member_id)
+    form = MemberForm()
+    user_group = db_sess.query(Group).filter(Group.id == current_user.group).first()
+    admin = db_sess.query(User).filter(User.id == user_group.group_admin).first()
+    group_member = db_sess.query(User).get(member_id)
+    form.login.data = group_member.login
+    form.email.data = group_member.email
+    form.is_admin.data = True
+    if admin != current_user:
+        form.is_admin.data = False
+
     return render_template('member.html', message='У вас нет прав')
 
 
