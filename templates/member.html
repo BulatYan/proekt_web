@@ -12,25 +12,17 @@
 <!--        </div>-->
         <div class="mb-4 row justify-content-md-center">
             <div class="mb-4 m-md-4 p-2 border border-warning col-12 col-md-5">
-                {{ member.login }}
+                {{ form.login }}
             </div>
             <div class="mb-4 m-md-4 p-2 border border-warning col-12 col-md-5">
-                {{ member.email }}
+                {{ form.email }}
             </div>
         </div>
-<!--        <div class="m4 row justify-content-around">-->
-<!--            <div class="col-12 col-md-4">-->
-<!--                {{ form.target.label }}<br>-->
-<!--                {{ form.target(class="form-control border border-warning") }}<br>-->
-<!--                {% for error in form.target.errors %}-->
-<!--                <p class="alert alert-danger" role="alert">{{ error }}</p>-->
-<!--                {% endfor %}-->
-<!--            </div>-->
-<!--        </div>-->
-        <div>{{ form.submit(type="submit", class="my-2 p-2 btn btn-primary") }}</div>
+        <div class="col-2"><a class="btn btn-primary" id="cancel" href="/members/{{ current_user.group }}">Отменить</a></div>
         {% if message: %}
         <div class="my-4 alert alert-danger" role="alert"> {{message}}</div>
         {% endif %}
     </form>
 </div>
+<div><a href="/task/{{ form.email.data }}"> Выдать цель </a></div>
 {% endblock %}

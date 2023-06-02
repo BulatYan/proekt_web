@@ -3,9 +3,9 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 
 
 from data import db_session
-from data.users import User
+from data.users import User, Task
 from data.groups import Group, GroupMember, Ticket
-from form.user import RegisterForm, LoginForm, MemberForm, ProfileForm, InviteForm
+from form.user import RegisterForm, LoginForm, MemberForm, ProfileForm, InviteForm, TaskForm
 from form.group import Create_GroupForm
 from data.description import Description
 
@@ -150,8 +150,7 @@ def member(member_id):
     form.is_admin.data = True
     if admin != current_user:
         form.is_admin.data = False
-
-    return render_template('member.html', message='У вас нет прав')
+    return render_template('member.html', form=form)
 
 
 #Создаем ссылку на сайт profile
@@ -172,12 +171,12 @@ def profile():
                                    message="Пароли не совпадают")
         user_profile.login = form.login.data
         user_profile.email = form.email.data
-        user_group = db_sess.query(Group).fillter(Group.group_name == form.group.data).first()
+        user_group = db_sess.query(Group).filter(Group.group_name == form.group.data).first()
         if not user_group:
             return render_template('profile.html', title='Изменение данных',
                                    form=form,
                                    message=f"Группа: '{form.group.data}' не существует.")
-        group_member = db_sess.query(GroupMember).fillter(GroupMember.members_group == user_group.id,
+        group_member = db_sess.query(GroupMember).filter(GroupMember.members_group == user_group.id,
                                                           GroupMember.member == user_profile.id).first()
         if not group_member:
             return render_template('profile.html', title='Изменение данных',
@@ -319,6 +318,74 @@ def invite():
                 f"<div>Пользователь {form.email.data} включен в группу</div>"\
                 "<a href='/'>Возврат</a>"
     return render_template('invite.html', title='Приглашение в группу', form=form)
+
+
+@app.route('/task/<email>', methods=['GET', 'POST'])
+@login_required
+def task(email):
+    form = TaskForm()
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.email == email).first()
+    group = db_sess.query(Group).filter(Group.id == current_user.group).first()
+    admin = db_sess.query(User).get(group.group_admin)
+    is_admin = False
+    if user.id == admin.id:
+        is_admin = True
+    form.login.data = user.login
+
+    if form.validate_on_submit():
+        task = Task(
+            login=user.login,
+            short_task=form.short_task.data,
+            detail_task=form.detail_task.data,
+            completed=form.completed.data
+        )
+
+        group = db_sess.query(Group).filter(Group.group_name == form.group.data).first()
+        if group:
+            group_exists = True
+            if db_sess.query(Ticket).filter(Ticket.email == form.email.data).first():
+                if db_sess.query(Ticket).filter(Ticket.members_group != form.group.data).first():
+                    return render_template('register.html', title='Регистрация',
+                                           form=form,
+                                           message=f"У вас нет приглашения в {form.group.data} \
+                                           или вы неправильно написали группу.")
+            else:
+                return render_template('register.html', title='Регистрация',
+                                       form=form,
+                                       message="У вас нет приглашений в никакие группы")
+        if db_sess.query(User).filter(User.email == form.email.data).first():
+            return render_template('register.html', title='Регистрация',
+                                   form=form,
+                                   message="Такой пользователь уже есть")
+        if not group_exists:
+            group = Group(
+                group_name=form.group.data,
+                description='Создан при регистрации'
+            )
+            db_sess.add(group)
+            db_sess.commit()
+        user = User(
+            group=group.id,
+            login=form.login.data,
+            email=form.email.data
+        )
+        user.set_password(form.password.data)
+        db_sess.add(user)
+        db_sess.commit()
+        if not group_exists:
+            group.group_admin = user.id
+        group_member = GroupMember(
+                member=user.id,
+                members_group=group.id,
+            )
+        db_sess.add(group_member)
+        db_sess.commit()
+        # TODO удалить тикет
+        return redirect('/')
+    return render_template('task.html', title='Постановка задачи', form=form)
+
+
 
 def main():
     db_session.global_init("db/db.db")

@@ -24,3 +24,17 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
         return check_password_hash(self.password, password)
 
 
+class Task(SqlAlchemyBase, UserMixin, SerializerMixin):
+    __tablename__ = 'Tasks'
+    id = sqlalchemy.Column(sqlalchemy.Integer,
+                           primary_key=True, autoincrement=True)
+    user_id = sqlalchemy.Column(sqlalchemy.Integer,
+                                sqlalchemy.ForeignKey("Users.id"))
+    author_id = sqlalchemy.Column(sqlalchemy.Integer,
+                                  sqlalchemy.ForeignKey("Users.id"))
+    group_id = sqlalchemy.Column(sqlalchemy.Integer,
+                                 sqlalchemy.ForeignKey("Groups.id"))
+    short_task = sqlalchemy.Column(sqlalchemy.String, unique=True, nullable=False)
+
+    detail_task = sqlalchemy.Column(sqlalchemy.String, unique=False)
+    completed = sqlalchemy.Column(sqlalchemy.Boolean)

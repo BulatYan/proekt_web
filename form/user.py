@@ -26,7 +26,6 @@ class MemberForm(FlaskForm):
     login = StringField('Имя пользователя', validators=[DataRequired()])
     email = EmailField('Почта', validators=[DataRequired()])
     is_admin = BooleanField('Является администратором')
-    submit = SubmitField('Сохранить')
 
 
 #Создаем класс ProfileForm
@@ -50,3 +49,10 @@ class MessageForm(FlaskForm):
     message = StringField('Сообщение')
     message_head = StringField('Сообщение')
 
+
+class TaskForm(FlaskForm):
+    login = StringField('Имя пользователя', validators=[DataRequired()])
+    short_task = StringField('Краткое описание', validators=[DataRequired()])
+    detail_task = StringField('Детальное описание', validators=[DataRequired()])
+    completed = BooleanField('Задача завершена')
+    submit = SubmitField('Создать')
