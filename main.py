@@ -398,7 +398,90 @@ def init_db():
         )
         db_sess.add(grop_member)
         db_sess.commit()
-
+        group = Group(
+            group_name="Цветоводы",
+            description="Начальная инициализация"
+        )
+        db_sess.add(group)
+        db_sess.commit()
+        user = User(
+            login="Петя",
+            group=group.id,
+            email="peter@mail.ru"
+        )
+        user.set_password("1")
+        db_sess.add(user)
+        db_sess.commit()
+        group.group_admin = user.id
+        grop_member = GroupMember(
+            member=user.id,
+            members_group=group.id
+        )
+        db_sess.add(grop_member)
+        db_sess.commit()
+        group = Group(
+            group_name="Цветоводы",
+            description="Начальная инициализация"
+        )
+        db_sess.add(group)
+        db_sess.commit()
+        user = User(
+            login="Антон",
+            group=group.id,
+            email="anton@mail.ru"
+        )
+        user.set_password("1")
+        db_sess.add(user)
+        db_sess.commit()
+        group.group_admin = user.id
+        grop_member = GroupMember(
+            member=user.id,
+            members_group=group.id
+        )
+        db_sess.add(grop_member)
+        db_sess.commit()
+        group = Group(
+            group_name="Строители",
+            description="Начальная инициализация"
+        )
+        db_sess.add(group)
+        db_sess.commit()
+        user = User(
+            login="Влад",
+            group=group.id,
+                email="vlad@mail.ru"
+            )
+        user.set_password("1")
+        db_sess.add(user)
+        db_sess.commit()
+        group.group_admin = user.id
+        grop_member = GroupMember(
+            member=user.id,
+            members_group=group.id
+        )
+        db_sess.add(grop_member)
+        db_sess.commit()
+        group = Group(
+            group_name="Строители",
+            description="Начальная инициализация"
+        )
+        db_sess.add(group)
+        db_sess.commit()
+        user = User(
+            login="Евгений",
+            group=group.id,
+            email="evgeh@mail.ru"
+        )
+        user.set_password("1")
+        db_sess.add(user)
+        db_sess.commit()
+        group.group_admin = user.id
+        grop_member = GroupMember(
+            member=user.id,
+            members_group=group.id
+        )
+        db_sess.add(grop_member)
+        db_sess.commit()
 
 def main():
     db_session.global_init("db/db.db")
