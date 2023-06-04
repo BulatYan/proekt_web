@@ -125,13 +125,18 @@ def reqister():
 #Cоздаем функцию members
 def members(group):
     db_sess = db_session.create_session()
+    group = db_sess.query(Group).filter(Group.id == current_user.group).first()
+    admin = db_sess.query(User).get(group.group_admin)
+    is_admin = False
+    if current_user.id == admin.id:
+        is_admin = True
     group_members = db_sess.query(GroupMember).filter(GroupMember.members_group == current_user.group,
                                                       GroupMember.member != current_user.id).all()
     group_members_new = []
     for row in group_members:
         group_members_new.append(db_sess.query(User).get(row.member))
 
-    return render_template('members.html', members=group_members_new)
+    return render_template('members.html', members=group_members_new, is_admin=is_admin)
 
 
 
@@ -377,6 +382,7 @@ def my_tasks():
 def init_db():
     db_sess = db_session.create_session()
     if db_sess.query(User).count() == 0:
+        # 1 Группа
         group = Group(
             group_name="Цветоводы",
             description="Начальная инициализация"
@@ -398,12 +404,6 @@ def init_db():
         )
         db_sess.add(grop_member)
         db_sess.commit()
-        group = Group(
-            group_name="Цветоводы",
-            description="Начальная инициализация"
-        )
-        db_sess.add(group)
-        db_sess.commit()
         user = User(
             login="Петя",
             group=group.id,
@@ -412,18 +412,11 @@ def init_db():
         user.set_password("1")
         db_sess.add(user)
         db_sess.commit()
-        group.group_admin = user.id
         grop_member = GroupMember(
             member=user.id,
             members_group=group.id
         )
         db_sess.add(grop_member)
-        db_sess.commit()
-        group = Group(
-            group_name="Цветоводы",
-            description="Начальная инициализация"
-        )
-        db_sess.add(group)
         db_sess.commit()
         user = User(
             login="Антон",
@@ -433,13 +426,14 @@ def init_db():
         user.set_password("1")
         db_sess.add(user)
         db_sess.commit()
-        group.group_admin = user.id
         grop_member = GroupMember(
             member=user.id,
             members_group=group.id
         )
         db_sess.add(grop_member)
         db_sess.commit()
+
+        # 2 Группа
         group = Group(
             group_name="Строители",
             description="Начальная инициализация"
@@ -449,7 +443,7 @@ def init_db():
         user = User(
             login="Влад",
             group=group.id,
-                email="vlad@mail.ru"
+            email="vlad1@mail.ru"
             )
         user.set_password("1")
         db_sess.add(user)
@@ -461,16 +455,32 @@ def init_db():
         )
         db_sess.add(grop_member)
         db_sess.commit()
+        user = User(
+            login="Евгений",
+            group=group.id,
+            email="evgeh@mail.ru"
+        )
+        user.set_password("1")
+        db_sess.add(user)
+        db_sess.commit()
+        grop_member = GroupMember(
+            member=user.id,
+            members_group=group.id
+        )
+        db_sess.add(grop_member)
+        db_sess.commit()
+
+        # 3 Группа
         group = Group(
-            group_name="Строители",
+            group_name="Водители",
             description="Начальная инициализация"
         )
         db_sess.add(group)
         db_sess.commit()
         user = User(
-            login="Евгений",
+            login="Андрей",
             group=group.id,
-            email="evgeh@mail.ru"
+            email="andrey@mail.ru"
         )
         user.set_password("1")
         db_sess.add(user)
@@ -482,7 +492,82 @@ def init_db():
         )
         db_sess.add(grop_member)
         db_sess.commit()
+        user = User(
+            login="Иван",
+            group=group.id,
+            email="ivan@mail.ru"
+        )
+        user.set_password("1")
+        db_sess.add(user)
+        db_sess.commit()
+        grop_member = GroupMember(
+            member=user.id,
+            members_group=group.id
+        )
+        db_sess.add(grop_member)
+        db_sess.commit()
+        user = User(
+            login="Саша",
+            group=group.id,
+            email="alex@mail.ru"
+        )
+        user.set_password("1")
+        db_sess.add(user)
+        db_sess.commit()
+        grop_member = GroupMember(
+            member=user.id,
+            members_group=group.id
+        )
+        db_sess.add(grop_member)
+        db_sess.commit()
 
+        a = [('Петро', 'peter11@mail.ru', '1'), ('Андрюха', 'andrey1@mail.ru', '1'), ('Илья', 'm0nesy@mail.ru', '1'),
+             ('Ян', 'yan@mail.ru', '1'), ('Solo', 'solo@mail.ru', '1'), ('Pugh', 'pugh@mail.ru', '1'),
+             ('Понтий', 'pon@mail.ru', '2'), ('Евграфий', 'evgf@mail.ru', '2'), ('Ростик', 'rost@mail.ru', '2'),
+             ('Анатолий', 'art@mail.ru', '2'), ('Арут', 'money@mail.ru', '2'), ('Вова', 'world@mail.ru', '2'),
+             ('Олег', 'oleg@mail.ru', '3'), ('Владлен', 'inst@mail.ru', '3'), ('Ярик', 'omg@mail.ru', '3'),
+             ('Дима', 'medved@mail.ru', '3'), ('Артём', 'artem@mail.ru', '3'), ('Саня', 'karto@mail.ru', '3')]
+        for i in a:
+            user = User(
+                login=i[0],
+                group=i[2],
+                email=i[1]
+            )
+            user.set_password("1")
+            db_sess.add(user)
+            db_sess.commit()
+            for j in range(1, 4):
+                grop_member = GroupMember(
+                    member=user.id,
+                    members_group=j
+                )
+                db_sess.add(grop_member)
+                db_sess.commit()
+        task_list = [(2, 1, 1, 'Посадить розу'), (3, 1, 1, 'Посадить одуванчик'), (9, 1, 1, 'Посадить фиалку'),
+                     (10, 1, 1, 'Посадить арбуз'), (11, 1, 1, 'Посадить кактус'), (12, 1, 1, 'Посадить пальму'),
+                     (5, 4, 2, 'Посадить розу'), (15, 4, 2, 'Посадить одуванчик'), (16, 4, 1, 'Посадить фиалку'),
+                     (17, 4, 2, 'Посадить арбуз'), (18, 4, 2, 'Посадить кактус'), (19, 4, 2, 'Посадить пальму'),
+                     (5, 4, 2, 'Построить дом'), (15, 4, 2, 'Построить сарай'), (16, 4, 2, 'Построить ферму'),
+                     (17, 4, 2, 'Построить башню'), (18, 4, 2, 'Построить замок'), (19, 4, 2, 'Построить мост'),
+                     (7, 6, 3, 'Построить дом'), (8, 6, 3, 'Построить сарай'), (21, 6, 3, 'Построить ферму'),
+                     (22, 6, 3, 'Построить башню'), (23, 6, 3, 'Построить замок'), (9, 1, 1, 'Построить мост'),
+                     (2, 1, 1, 'Поехать домой'), (3, 1, 1, 'Поехать на Невский проспект'),
+                     (21, 6, 3, 'Поехать в больницу'), (10, 1, 1, 'Поехать в гостиницу'),
+                     (11, 1, 1, 'Поехать в магазин'), (12, 1, 1, 'Поехать в синагогу'),
+                     (7, 6, 3, 'Поехать домой'), (8, 6, 3, 'Поехать на Невский проспект'), (21, 6, 3,
+                                                                                            'Поехать в больницу'),
+                     (22, 6, 3, 'Поехать в гостиницу'), (23, 6, 3, 'Поехать в магазин'), (24, 6, 3,
+                                                                                          'Поехать в синагогу')]
+        for i in task_list:
+            task = Task(
+                user_id=i[0],
+                author_id=i[1],
+                group_id=i[2],
+                short_task=i[3],
+                detail_task=i[3]
+            )
+            db_sess.add(task)
+            db_sess.commit()
 def main():
     db_session.global_init("db/db.db")
     init_db()

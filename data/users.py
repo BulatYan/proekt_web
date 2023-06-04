@@ -34,7 +34,7 @@ class Task(SqlAlchemyBase, UserMixin, SerializerMixin):
                                   sqlalchemy.ForeignKey("Users.id"))
     group_id = sqlalchemy.Column(sqlalchemy.Integer,
                                  sqlalchemy.ForeignKey("Groups.id"))
-    short_task = sqlalchemy.Column(sqlalchemy.String, unique=True, nullable=False)
+    short_task = sqlalchemy.Column(sqlalchemy.String, nullable=False)
 
     detail_task = sqlalchemy.Column(sqlalchemy.String, unique=False)
     completed = sqlalchemy.Column(sqlalchemy.Boolean)

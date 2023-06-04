@@ -11,5 +11,10 @@
 </div>
 {% endfor %}
 </div>
-<div><a href="/invite">Приглашение в группу</a></div>
+<div class="m4 row justify-content-around">
+         {% if is_admin: %}
+            <div><a href="/invite">Приглашение в группу</a></div>
+         {% endif %}
+</div>
+
 {% endblock %}
