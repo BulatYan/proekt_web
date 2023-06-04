@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Поставленные задачи</h3>
+<p class="my-3 my-md-4">Здесь вы можете посмотреть какие задачи у вас есть.</p>
+{% for descr in tasks%}
+<div class="my-2 p-2 border rounded border-success">
+    <div class="m4 row justify-content-around">
+        <div class="col-12 col-md-4">
+            <div>Группа:</div>
+            <div class="form-control border border-warning">{{ descr[0] }}</div>
+        </div>
+<!--    </div>-->
+<!--     <div class="m4 row justify-content-around">-->
+        <div class="col-12 col-md-4">
+            <div>Автор:</div>
+            <div class="form-control border border-warning">{{ descr[1] }}</div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div>Краткое описание:</div>
+            <div class="form-control border border-warning">{{ descr[2] }}</div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div>Полное описание:</div>
+            <div class="form-control border border-warning">{{ descr[3] }}</div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div>Статус задачи:</div>
+            <div class="form-control border border-warning">{{ descr[4] }}</div>
+        </div>
+    </div>
+
+</div>
+{% endfor %}
+{% if message: %}
+    <div class="my-4 alert alert-danger" role="alert"> {{message}}</div>
+    {% endif %}
+{% endblock %}

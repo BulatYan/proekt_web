@@ -33,8 +33,10 @@
     </p>
     <p>{{ form.completed() }} {{ form.completed.label }}</p>
      <div class="m4 row justify-content-around">
-        <div class="col-2">{{ form.submit(type="submit", class="btn btn-primary") }}</div>
-        <div class="col-2"><a class="btn btn-primary" id="cancel" href="/">Отменить</a></div>
+         {% if is_admin: %}
+            <div class="col-2">{{ form.submit(type="submit", class="btn btn-primary") }}</div>
+         {% endif %}
+         <div class="col-2"><a class="btn btn-primary" id="cancel" href="/">Отменить</a></div>
     </div>
     {% if message: %}
     <div class="my-4 alert alert-danger" role="alert"> {{message}}</div>

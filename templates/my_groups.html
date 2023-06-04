@@ -1,10 +1,22 @@
 {% extends "base.html" %}
 {% block content %}
-<h3>Здесь вы можете посмотреть в каких группах вы состоите.</h3>
+<h3>Здесь вы можете посмотреть в каких группах вы являетесь администратором.</h3>
 {% for group in group_list%}
-<div class="my-2 p-2 border rounded border-warning">
-    {{ group[0] }} - {{ group[1] }}
+<div class="my-2 p-2 border rounded border-success">
+    <div class="m4 row justify-content-around">
+        <div class="col-12 col-md-4">
+            <div>Админ:</div>
+            <div class="form-control border border-warning">{{ group[1] }}</div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div>Группа:</div>
+            <div class="form-control border border-warning">{{ group[0] }}</div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div>Описание:</div>
+            <div class="form-control border border-warning">{{ group[2] }}</div>
+        </div>
 </div>
 {% endfor %}
-<a class="btn btn-primary" id="cancel" href="/profile">Отменить</a>
+<a class="m4 btn btn-primary" id="cancel" href="/profile">Отменить</a>
 {% endblock %}

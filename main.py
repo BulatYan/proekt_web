@@ -283,11 +283,13 @@ def create_group():
 def my_groups():
     db_sess = db_session.create_session()
     group_list = []
-    groups = db_sess.query(Group).filter(Group.group_admin == current_user.id).all()
+    groups = db_sess.query(GroupMember).filter(GroupMember.member == current_user.id).all()
     for row in groups:
-        if not row.description:
-            row.description = 'None'
-        cor = (row.group_name, row.description)
+        group = db_sess.query(Group).filter(Group.id == row.members_group).first()
+        admin = db_sess.query(User).get(group.group_admin).login
+        if not group.description:
+            group.description = 'None'
+        cor = (group.group_name, admin, group.description)
         group_list.append(cor)
 
     return render_template('my_groups.html', group_list=group_list)
@@ -320,77 +322,88 @@ def invite():
     return render_template('invite.html', title='Приглашение в группу', form=form)
 
 
-@app.route('/task/<email>', methods=['GET', 'POST'])
+@app.route('/create_task/<email>', methods=['GET', 'POST'])
 @login_required
-def task(email):
+def create_task(email):
     form = TaskForm()
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter(User.email == email).first()
     group = db_sess.query(Group).filter(Group.id == current_user.group).first()
     admin = db_sess.query(User).get(group.group_admin)
     is_admin = False
-    if user.id == admin.id:
+    if current_user.id == admin.id:
         is_admin = True
     form.login.data = user.login
 
     if form.validate_on_submit():
         task = Task(
-            login=user.login,
+            author_id=admin.id,
+            user_id=user.id,
+            group_id=group.id,
             short_task=form.short_task.data,
             detail_task=form.detail_task.data,
             completed=form.completed.data
         )
+        db_sess.add(task)
+        db_sess.commit()
 
-        group = db_sess.query(Group).filter(Group.group_name == form.group.data).first()
-        if group:
-            group_exists = True
-            if db_sess.query(Ticket).filter(Ticket.email == form.email.data).first():
-                if db_sess.query(Ticket).filter(Ticket.members_group != form.group.data).first():
-                    return render_template('register.html', title='Регистрация',
-                                           form=form,
-                                           message=f"У вас нет приглашения в {form.group.data} \
-                                           или вы неправильно написали группу.")
+        return redirect(f'/member/{user.id}')
+    return render_template('task.html', title='Постановка задачи', form=form, is_admin=is_admin)
+
+
+@app.route('/my_tasks', methods=['GET', 'POST'])
+@login_required
+def my_tasks():
+    db_sess = db_session.create_session()
+    task_list = []
+    tasks = db_sess.query(Task).filter(Task.user_id == current_user.id).all()
+    if tasks:
+        for row in tasks:
+            group = db_sess.query(Group).get(row.group_id).group_name
+            author = db_sess.query(User).get(row.author_id).login
+            short_task = row.short_task
+            detail_task = row.detail_task
+            completed = row.completed
+            if completed:
+                completed = 'Задача выполнена'
             else:
-                return render_template('register.html', title='Регистрация',
-                                       form=form,
-                                       message="У вас нет приглашений в никакие группы")
-        if db_sess.query(User).filter(User.email == form.email.data).first():
-            return render_template('register.html', title='Регистрация',
-                                   form=form,
-                                   message="Такой пользователь уже есть")
-        if not group_exists:
-            group = Group(
-                group_name=form.group.data,
-                description='Создан при регистрации'
-            )
-            db_sess.add(group)
-            db_sess.commit()
-        user = User(
-            group=group.id,
-            login=form.login.data,
-            email=form.email.data
+                completed = 'Задача не выполнена'
+            cor = (group, author, short_task, detail_task, completed)
+            task_list.append(cor)
+        return render_template('my_tasks.html', tasks=task_list)
+    return render_template('my_tasks.html', message='У вас нет задач')
+
+
+def init_db():
+    db_sess = db_session.create_session()
+    if db_sess.query(User).count() == 0:
+        group = Group(
+            group_name="Цветоводы",
+            description="Начальная инициализация"
         )
-        user.set_password(form.password.data)
+        db_sess.add(group)
+        db_sess.commit()
+        user = User(
+            login="Володя",
+            group=group.id,
+            email="vlad@mail.ru"
+        )
+        user.set_password("1")
         db_sess.add(user)
         db_sess.commit()
-        if not group_exists:
-            group.group_admin = user.id
-        group_member = GroupMember(
-                member=user.id,
-                members_group=group.id,
-            )
-        db_sess.add(group_member)
+        group.group_admin = user.id
+        grop_member = GroupMember(
+            member=user.id,
+            members_group=group.id
+        )
+        db_sess.add(grop_member)
         db_sess.commit()
-        # TODO удалить тикет
-        return redirect('/')
-    return render_template('task.html', title='Постановка задачи', form=form)
-
 
 
 def main():
     db_session.global_init("db/db.db")
+    init_db()
     app.run()
-
 
 if __name__ == '__main__':
     main()
