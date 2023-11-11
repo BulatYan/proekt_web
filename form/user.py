@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, StringField, SubmitField, EmailField, BooleanField
+from wtforms import PasswordField, StringField, SubmitField, EmailField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired
 
 
@@ -23,8 +23,8 @@ class LoginForm(FlaskForm):
 
 #Создаем класс MemberForm
 class MemberForm(FlaskForm):
-    login = StringField('Имя пользователя', validators=[DataRequired()])
-    email = EmailField('Почта', validators=[DataRequired()])
+    login = StringField('Имя пользователя', render_kw={'readonly': True}, validators=[DataRequired()])
+    email = EmailField('Почта', render_kw={'readonly': True}, validators=[DataRequired()])
     is_admin = BooleanField('Является администратором')
 
 
@@ -51,8 +51,8 @@ class MessageForm(FlaskForm):
 
 
 class TaskForm(FlaskForm):
-    login = StringField('Имя пользователя', validators=[DataRequired()])
+    login = StringField('Имя пользователя',render_kw={'readonly': True}, validators=[DataRequired()])
     short_task = StringField('Краткое описание', validators=[DataRequired()])
-    detail_task = StringField('Детальное описание', validators=[DataRequired()])
+    detail_task = TextAreaField('Детальное описание', validators=[DataRequired()])
     completed = BooleanField('Задача завершена')
     submit = SubmitField('Создать')

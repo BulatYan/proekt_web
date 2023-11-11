@@ -25,5 +25,14 @@
     </form>
 </div>
 </br>
-<div class="m4"><a href="/create_task/{{ form.email.data }}"> Поставить задачу </a></div>
+<div class="m4 row justify-content-around">
+         {% if is_admin: %}
+            <div class="m4"><a href="/create_task/{{ form.email.data }}"> Поставить задачу </a></div>
+         {% endif %}
+</div>
+<div class="m4 row justify-content-around">
+         {% if is_admin: %}
+            <div class="m4"><a href="/list_tasks/{{ form.email.data }}"> Просмотр задач </a></div>
+         {% endif %}
+</div>
 {% endblock %}

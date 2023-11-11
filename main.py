@@ -148,14 +148,15 @@ def member(member_id):
     db_sess = db_session.create_session()
     form = MemberForm()
     user_group = db_sess.query(Group).filter(Group.id == current_user.group).first()
-    admin = db_sess.query(User).filter(User.id == user_group.group_admin).first()
     group_member = db_sess.query(User).get(member_id)
     form.login.data = group_member.login
     form.email.data = group_member.email
-    form.is_admin.data = True
-    if admin != current_user:
-        form.is_admin.data = False
-    return render_template('member.html', form=form)
+    group = db_sess.query(Group).filter(Group.id == current_user.group).first()
+    admin = db_sess.query(User).get(group.group_admin)
+    is_admin = False
+    if current_user.id == admin.id:
+        is_admin = True
+    return render_template('member.html', form=form, is_admin=is_admin)
 
 
 #Создаем ссылку на сайт profile
@@ -377,6 +378,59 @@ def my_tasks():
             task_list.append(cor)
         return render_template('my_tasks.html', tasks=task_list)
     return render_template('my_tasks.html', message='У вас нет задач')
+
+
+@app.route('/list_tasks/<email>', methods=['GET'])
+@login_required
+def list_tasks(email):
+    db_sess = db_session.create_session()
+    task_list = []
+    user = db_sess.query(User).filter(User.email == email).first()
+    tasks = db_sess.query(Task).filter(Task.user_id == user.id).all()
+    if tasks:
+        for row in tasks:
+            # group = db_sess.query(Group).get(row.group_id).group_name
+            # author = db_sess.query(User).get(row.author_id).login
+            short_task = row.short_task
+            detail_task = row.detail_task
+            completed = row.completed
+            if completed:
+                completed = 'Задача выполнена'
+            else:
+                completed = 'Задача не выполнена'
+            cor = (short_task, detail_task, completed, row.id)
+            task_list.append(cor)
+        return render_template('list_tasks.html', tasks=task_list)
+    return render_template('list_tasks.html', tasks=task_list, message='У пользователя нет задач')
+
+
+@app.route('/user_task/<id>', methods=['GET'])
+@login_required
+def user_task(id):
+    db_sess = db_session.create_session()
+    task = db_sess.query(Task).get(id)
+    user = db_sess.query(User).filter(User.id == task.user_id).first()
+    group = db_sess.query(Group).filter(Group.id == current_user.group).first()
+    admin = db_sess.query(User).get(group.group_admin)
+    is_admin = False
+    if current_user.id == admin.id:
+        is_admin = True
+    form.login.data = user.login
+
+    if form.validate_on_submit():
+        task = Task(
+            author_id=admin.id,
+            user_id=user.id,
+            group_id=group.id,
+            short_task=form.short_task.data,
+            detail_task=form.detail_task.data,
+            completed=form.completed.data
+        )
+        db_sess.add(task)
+        db_sess.commit()
+
+        return redirect(f'/member/{user.id}')
+    return render_template('task.html', title='Постановка задачи', form=form, is_admin=is_admin)
 
 
 def init_db():
