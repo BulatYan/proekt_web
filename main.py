@@ -410,27 +410,32 @@ def user_task(id):
     form = TaskForm()
     db_sess = db_session.create_session()
     task = db_sess.query(Task).get(id)
-    user = db_sess.query(User).filter(User.id == task.user_id).first()
-    group = db_sess.query(Group).filter(Group.id == current_user.group).first()
+    user = db_sess.query(User).get(task.user_id)
+    group = db_sess.query(Group).get(current_user.group)
     admin = db_sess.query(User).get(group.group_admin)
     is_admin = False
     if current_user.id == admin.id:
         is_admin = True
-    form.login.data = user.login
-
     if form.validate_on_submit():
+
         task = Task(
             author_id=admin.id,
             user_id=user.id,
-            group_id=group.id,
+            group_id=current_user.group,
             short_task=form.short_task.data,
             detail_task=form.detail_task.data,
             completed=form.completed.data
         )
-        db_sess.add(task)
-        db_sess.commit()
 
-        return redirect(f'/user_task/{user.id}')
+        # db_sess.update(task)
+        db_sess.commit()
+        return redirect(f'/list_tasks/{user.email}')
+
+    form.login.data = user.login
+    form.short_task.data = task.short_task
+    form.detail_task.data = task.detail_task
+    form.completed.data = task.completed
+
     return render_template('user_task.html', title='Изменение задачи', form=form, is_admin=is_admin)
 
 
