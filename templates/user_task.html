@@ -1,35 +1,35 @@
 {% extends "base.html" %}
 {% block content %}
 <h3>Постановка задачи</h3>
-<p class="my-3 my-md-4">Здесь вам следует описать задачу участнику группы.</p>
+<p class="my-3 my-md-4">Здесь вам следует редактировать задачу участнику группы.</p>
 <form action="" method="post" novalidate>
     {{ form.hidden_tag() }}
     <div>
         {{ form.login.label }}<br>
         {{ form.login(class="form-control border border-warning", type="email") }}<br>
         {% for error in form.login.errors %}
-    <div class="alert alert-danger" role="alert">
-        {{ error }}
-    </div>
-    {% endfor %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% endfor %}
     </div>
     <p>
         {{ form.short_task.label }}<br>
         {{ form.short_task(class="form-control border border-warning") }}<br>
         {% for error in form.short_task.errors %}
-    <div class="alert alert-danger" role="alert">
-        {{ error }}
-    </div>
-    {% endfor %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
     </p>
      <p>
         {{ form.detail_task.label }}<br>
         {{ form.detail_task(class="form-control border border-warning") }}<br>
         {% for error in form.detail_task.errors %}
-    <div class="alert alert-danger" role="alert">
-        {{ error }}
-    </div>
-    {% endfor %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
     </p>
     <p>{{ form.completed() }} {{ form.completed.label }}</p>
      <div class="m4 row justify-content-around">
@@ -38,8 +38,8 @@
          {% endif %}
          <div class="col-2"><a class="btn btn-primary" id="cancel" href="/">Отменить</a></div>
     </div>
-    {% if message: %}
-    <div class="my-4 alert alert-danger" role="alert"> {{message}}</div>
-    {% endif %}
+<!--    {% if message: %}-->
+<!--    <div class="my-4 alert alert-danger" role="alert"> {{message}}</div>-->
+<!--    {% endif %}-->
 </form>
 {% endblock %}

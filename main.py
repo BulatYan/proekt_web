@@ -404,9 +404,10 @@ def list_tasks(email):
     return render_template('list_tasks.html', tasks=task_list, message='У пользователя нет задач')
 
 
-@app.route('/user_task/<id>', methods=['GET'])
+@app.route('/user_task/<id>', methods=['GET', 'POST'])
 @login_required
 def user_task(id):
+    form = TaskForm()
     db_sess = db_session.create_session()
     task = db_sess.query(Task).get(id)
     user = db_sess.query(User).filter(User.id == task.user_id).first()
@@ -429,8 +430,8 @@ def user_task(id):
         db_sess.add(task)
         db_sess.commit()
 
-        return redirect(f'/member/{user.id}')
-    return render_template('task.html', title='Постановка задачи', form=form, is_admin=is_admin)
+        return redirect(f'/user_task/{user.id}')
+    return render_template('user_task.html', title='Изменение задачи', form=form, is_admin=is_admin)
 
 
 def init_db():

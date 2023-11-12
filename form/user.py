@@ -51,8 +51,9 @@ class MessageForm(FlaskForm):
 
 
 class TaskForm(FlaskForm):
-    login = StringField('Имя пользователя',render_kw={'readonly': True}, validators=[DataRequired()])
+    login = StringField('Имя пользователя', render_kw={'readonly': True}, validators=[DataRequired()])
     short_task = StringField('Краткое описание', validators=[DataRequired()])
     detail_task = TextAreaField('Детальное описание', validators=[DataRequired()])
     completed = BooleanField('Задача завершена')
     submit = SubmitField('Создать')
+    cancel = SubmitField('Отменить')
