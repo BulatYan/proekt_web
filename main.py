@@ -168,6 +168,11 @@ def profile():
     db_sess = db_session.create_session()
     user_profile = db_sess.query(User).get(current_user.id)
     user_group = db_sess.query(Group).get(current_user.group)
+    member_groups = db_sess.query(GroupMember).filter(GroupMember.member == current_user.id).all()
+    groups = []
+    for i in member_groups:
+        group_name = db_sess.query(Group).get(i.members_group).group_name
+        groups.append((i.members_group, group_name))
     if form.validate_on_submit():
         if form.cancel.data:
             return redirect('/')
@@ -177,26 +182,16 @@ def profile():
                                    message="Пароли не совпадают")
         user_profile.login = form.login.data
         user_profile.email = form.email.data
-        user_group = db_sess.query(Group).filter(Group.group_name == form.group.data).first()
-        if not user_group:
-            return render_template('profile.html', title='Изменение данных',
-                                   form=form,
-                                   message=f"Группа: '{form.group.data}' не существует.")
-        group_member = db_sess.query(GroupMember).filter(GroupMember.members_group == user_group.id,
-                                                          GroupMember.member == user_profile.id).first()
-        if not group_member:
-            return render_template('profile.html', title='Изменение данных',
-                                   form=form,
-                                   message=f"Вы не являетесь членом группы '{form.group.data}'.")
-        user_profile.group = user_group.id
+        user_profile.group = form.group.data
         if form.password.data:
             user_profile.set_password(form.password.data)
         db_sess.commit()
-        return redirect('/')
+        return redirect('/profile')
     else:
         form.login.data = user_profile.login
         form.email.data = user_profile.email
-        form.group.data = user_group.group_name
+        form.group.choices = groups
+        form.group.data = user_group.id
     return render_template('profile.html', title='Изменение данных',
                            form=form)
 
@@ -404,39 +399,33 @@ def list_tasks(email):
     return render_template('list_tasks.html', tasks=task_list, message='У пользователя нет задач')
 
 
-@app.route('/user_task/<id>', methods=['GET', 'POST'])
+@app.route('/edit_task/<id>', methods=['GET', 'POST'])
 @login_required
-def user_task(id):
+def edit_task(id):
     form = TaskForm()
     db_sess = db_session.create_session()
     task = db_sess.query(Task).get(id)
+
+    if form.validate_on_submit():
+        task.short_task = form.short_task.data
+        task.detail_task = form.detail_task.data
+        task.completed = form.completed.data
+        db_sess.commit()
+        return redirect(f'/edit_task/{id}')
+
     user = db_sess.query(User).get(task.user_id)
     group = db_sess.query(Group).get(current_user.group)
     admin = db_sess.query(User).get(group.group_admin)
     is_admin = False
     if current_user.id == admin.id:
         is_admin = True
-    if form.validate_on_submit():
-
-        task = Task(
-            author_id=admin.id,
-            user_id=user.id,
-            group_id=current_user.group,
-            short_task=form.short_task.data,
-            detail_task=form.detail_task.data,
-            completed=form.completed.data
-        )
-
-        # db_sess.update(task)
-        db_sess.commit()
-        return redirect(f'/list_tasks/{user.email}')
 
     form.login.data = user.login
     form.short_task.data = task.short_task
     form.detail_task.data = task.detail_task
     form.completed.data = task.completed
-
-    return render_template('user_task.html', title='Изменение задачи', form=form, is_admin=is_admin)
+    form.submit.label.text = 'Изменить'
+    return render_template('edit_task.html', title='Изменение задачи', form=form, is_admin=is_admin)
 
 
 def init_db():

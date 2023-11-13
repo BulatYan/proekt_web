@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, StringField, SubmitField, EmailField, BooleanField, TextAreaField
+from wtforms import PasswordField, StringField, SubmitField, EmailField, BooleanField, TextAreaField, SelectField
 from wtforms.validators import DataRequired
 
 
@@ -30,7 +30,7 @@ class MemberForm(FlaskForm):
 
 #Создаем класс ProfileForm
 class ProfileForm(FlaskForm):
-    group = StringField('Название группы', validators=[DataRequired()])
+    group = SelectField('Название группы', choices=[], coerce=int, validate_choice=False)
     login = StringField('Имя пользователя', validators=[DataRequired()])
     email = EmailField('Почта', validators=[DataRequired()])
     password = PasswordField('Пароль')
