@@ -19,13 +19,17 @@
             <div>Краткое описание:</div>
             <div class="form-control border border-warning">{{ descr[2] }}</div>
         </div>
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-8">
             <div>Полное описание:</div>
             <div class="form-control border border-warning">{{ descr[3] }}</div>
         </div>
         <div class="col-12 col-md-4">
             <div>Статус задачи:</div>
-            <div class="form-control border border-warning">{{ descr[4] }}</div>
+            {% if descr[4] == 'Задача выполнена': %}
+                <div class="form-control border border-warning text-success">{{ descr[4] }}</div>
+            {% else: %}
+                <div class="form-control border border-warning text-danger">{{ descr[4] }}</div>
+                {% endif %}
         </div>
     </div>
 
