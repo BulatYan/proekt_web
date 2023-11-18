@@ -6,8 +6,9 @@ from data import db_session
 from data.users import User, Task
 from data.groups import Group, GroupMember, Ticket
 from form.user import RegisterForm, LoginForm, MemberForm, ProfileForm, InviteForm, TaskForm
-from form.group import Create_GroupForm
+from form.group import Create_GroupForm, Leave_Group
 from data.description import Description
+from sqlalchemy import delete
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'ps_secret_key'
@@ -426,6 +427,38 @@ def edit_task(id):
     form.completed.data = task.completed
     form.submit.label.text = 'Изменить'
     return render_template('edit_task.html', title='Изменение задачи', form=form, is_admin=is_admin)
+
+
+@app.route('/leave_group', methods=['GET', 'POST'])
+@login_required
+def leave_group():
+    form = Leave_Group()
+    db_sess = db_session.create_session()
+    user_profile = db_sess.query(User).get(current_user.id)
+    current_group = db_sess.query(Group).get(current_user.group)
+    member_groups = db_sess.query(GroupMember).filter(GroupMember.member == current_user.id).all()
+    other_groups = []
+    for element in member_groups:
+        if element.members_group != current_group.id:
+            group_name = db_sess.query(Group).get(element.members_group).group_name
+            other_groups.append((element.members_group, group_name))
+    if len(other_groups) == 0:
+        pass
+    if form.validate_on_submit():
+        if form.cancel.data:
+            return redirect('/profile')
+        old_member_group = db_sess.query(GroupMember).filter(GroupMember.members_group == current_group.id).first()
+        user_profile.group = form.group_new.data
+        # db_sess.delete(old_member_group)
+        stmt = delete(GroupMember).where(GroupMember.members_group == current_group.id)
+        db_sess.execute(stmt)
+        db_sess.commit()
+        return redirect('/profile')
+    else:
+        form.group_old.data = current_group.group_name
+        form.group_new.choices = other_groups
+    return render_template('leave_group.html', title='Изменение группы',
+                           form=form)
 
 
 def init_db():
