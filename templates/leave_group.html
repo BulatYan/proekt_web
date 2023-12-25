@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3>Создать группу</h3>
+<p class="my-3 my-md-4">Здесь вам предстоит покинуть группу.</p>
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <div class="m4 row justify-content-around">
+        <div class="col-12 col-md-4">
+            {{ form.group_old.label }}<br>
+            {{ form.group_old(class="form-control border border-warning") }}<br>
+            {% for error in form.group_old.errors %}
+            <p class="alert alert-danger" role="alert">{{ error }}</p>
+            {% endfor %}
+        </div>
+        <div class="col-12 col-md-4">
+            {{ form.group_new.label }}<br>
+            {{ form.group_new(class="form-control border border-warning") }}<br>
+            {% for error in form.group_new.errors %}
+            <p class="alert alert-danger" role="alert">{{ error }}</p>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="m4 row justify-content-around">
+        <div class="col-2">{{ form.submit(type="submit", class="btn btn-primary") }}</div>
+<!--        <div class="col-2"><a class="btn btn-primary" id="cancel" href="/profile">Отменить</a></div>-->
+        <div class="col-2">{{ form.cancel(type="submit", class="btn btn-primary") }}</div>
+    </div>
+    {% if message: %}
+    <div class="my-4 alert alert-danger" role="alert"> {{message}}</div>
+    {% endif %}
+</form>
+{% endblock %}
